@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <stdexcept>
+
 using namespace std;
 
 // Author class
@@ -21,12 +22,26 @@ public:
 class Book {
 private:
     string title;
-    Author author;
+    Author author; // Use value instead of const reference
     int publicationYear;
 
 public:
     Book(const string& title, const Author& author, int publicationYear)
         : title(title), author(author), publicationYear(publicationYear) {}
+
+    // Copy constructor
+    Book(const Book& other)
+        : title(other.title), author(other.author), publicationYear(other.publicationYear) {}
+
+    // Copy assignment operator
+    Book& operator=(const Book& other) {
+        if (this != &other) {
+            title = other.title;
+            author = other.author;
+            publicationYear = other.publicationYear;
+        }
+        return *this;
+    }
 
     string getTitle() const { return title; }
     Author getAuthor() const { return author; }
@@ -93,12 +108,15 @@ int main() {
             cin >> publicationYearStr;
             try {
                 publicationYear = stoi(publicationYearStr);
+                if (publicationYear <= 0) {
+                    throw invalid_argument("Publication year must be a positive integer.");
+                }
                 Author author(authorName);
                 Book book(title, author, publicationYear);
                 myLibrary.addBook(book);
             }
             catch (const invalid_argument& e) {
-                cout << "Invalid publication year entered. Please try again." << endl;
+                cout << "Invalid input: " << e.what() << endl;
             }
             break;
         case 2:
